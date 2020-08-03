@@ -1,0 +1,274 @@
+#!/usr/bin/env bash
+#echo
+#echo
+#echo "Date = $1"
+#echo "Hours and minutes = $2"
+#echo "Rainbow table = $3"
+#echo "Tweet counter = $4"
+#echo "Total tweets number = $5"
+#echo "Path to test  = $6"
+#####Old echo "File to test = $7"
+#echo "Loop counter = 0"
+#echo "Sec2Test = $7"
+#echo
+
+param=$(echo $1 $2)
+rainbowpath=$(echo "$3rainbow.table")
+realcounter=$(echo "$4")
+loopcounter=0
+file=$(echo "$6")
+success=0
+Sec2Test=$(echo "$7")
+check=0
+
+echo "Seconds to test : $Sec2Test "
+HalfSec2Test=$(($Sec2Test/2))
+
+
+
+echo $param
+echo "TimeTravel $param $HalfSec2Test seconds ago"
+
+paramfinal2=$(echo $(date -d "$param $HalfSec2Test seconds ago" "+%Y-%m-%d %H:%M:%S"))
+echo "$paramfinal2 done"
+echo
+
+#sleep 5
+
+
+function show_time () {
+    num=$1
+    min=0
+    hour=0
+    day=0
+    if((num>59));then
+        ((sec=num%60))
+        ((num=num/60))
+        if((num>59));then
+            ((min=num%60))
+            ((num=num/60))
+            if((num>23));then
+                ((hour=num%24))
+                ((day=num/24))
+            else
+                ((hour=num))
+            fi
+        else
+            ((min=num))
+        fi
+    else
+        ((sec=num))
+    fi
+    echo "$day"d "$hour"h "$min"m "$sec"s
+}
+
+
+echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;
+
+((HalfSec2Test++))
+paramfinal=$(echo $(date -d "$param $HalfSec2Test seconds ago" "+%Y-%m-%d %H:%M:%S"))
+
+
+for i in `seq 1 $Sec2Test`
+do
+		((loopcounter++))
+		DATE=$(echo $(date -d "$paramfinal $i seconds" "+%Y-%m-%d;%H:%M:%S"))
+		let "counter = 0"
+		up=$(tput cup rc)
+		erase=$(tput ed)
+		sav=$(tput sc)
+		echo $DATE
+		realtwt=$(($5-$4+1))
+
+		SECONDS=0
+                TimeLeft="Calculating.."
+                FinalTimeLeft="Calculating.."
+
+#		echo -n "$sav"
+#		echo -n "$erase"
+		while read line
+		do
+
+
+        	     SAMPLE=$(echo $line)
+        	     MD5=$(echo $DATE $SAMPLE \
+        	        | md5sum \
+			| awk '{ print $1 }')
+
+        	     #SAMPLE2=$(echo $line)
+        	     MD52=$(echo -n $DATE $SAMPLE \
+        	        | md5sum \
+			| awk '{ print $1 }')
+
+
+		     if [ $counter -eq 1000 ]
+		     then
+				if [ $check -eq 0 ]
+				then
+					
+		                	Laps=$SECONDS
+                                	math=$(($Laps*31*$realtwt*$Sec2Test))
+					math1lap=$(($Laps*31))
+					Finalmath=$math
+					
+				else
+					Finalmath=$(($Finalmath-$math1lap))
+					
+				fi
+
+                                TimeLeft=$(show_time "$Finalmath")
+				FinalTimeLeft="$TimeLeft ......"
+				check=1
+
+		     fi 
+#	     	echo -n "$erase"
+#            	echo "============================================="
+		if [ $counter -lt 1000 ]
+		then
+			echo -ne "Time Left : $TimeLeft\\r"
+		else
+			echo -ne "Time Left : $FinalTimeLeft\\r"
+		fi
+#             	echo "Current line in file : "
+#             	echo "$counter / 31102 "
+#             	echo "Md5 Found : $success "
+#             	echo "Date = $DATE "
+#	     	echo "Tweet Nbr : $4 / $5"
+#	     	echo "Current Seconds : $loopcounter / $Sec2Test"
+#	     	echo "======"
+#             	echo "Md5 = $MD5"
+#		echo "======"
+#		echo "Md5-16 = ${MD5:8:16}"
+#	     	echo "======"
+#             	echo "Md5 echo -n = $MD52"
+#		echo "======"
+#		echo "Md5-16 echo -n = ${MD52:8:16}"
+#	     	echo "==================="
+#             	echo "Text in file: $line"
+#             	echo "============================================="
+#	     	echo "Trying to find Md5 in $6 :"
+	     
+
+
+		md5="$MD5"
+		md52="$MD52"
+		pos=6
+		size=${#md5}
+		size2=${#md52}
+
+#		echo "=============================================">>$rainbowpath
+		while [ $pos -le $size ]
+		do
+
+		        #echo ${md5:0:$pos}
+
+		        sample=${md5:0:$pos}
+
+		        cat "$file" | grep -q "$sample"
+
+		        if [ $? -eq 0 ] 
+		        then
+                                echo "=============================================">>$rainbowpath
+		                echo "Fucking Found $sample in $file !"
+				echo "Fucking Found $sample in $file !">>$rainbowpath
+		                echo "Date = $DATE Tweet Nbr : $4 Current Second : $loopcounter">>$rainbowpath
+        		        echo "Text = $SAMPLE">>$rainbowpath
+                		echo "Md5sum = $MD5">>$rainbowpath
+                		echo "Md5sum (echo-n) = $MD52">>$rainbowpath
+                		echo "=============================================">>$rainbowpath
+
+
+				((success++))
+				sleep 10
+				
+		         else
+#		        	   echo "No Md5 Found looser .."
+				   break
+		        fi
+		        let pos=pos+1
+		done
+
+
+#			echo "===================="
+
+                        #echo ${md5:8:16}
+
+                        #sample2=${md5:8:16}
+
+                        #cat "$file" | grep -q "$sample2"
+
+                        #if [ $? -eq 0 ] 
+                        #then
+                                #echo "Fucking Found Md5-16 $sample2 in $file !"
+                                #echo "Fucking Found Md5-16 $sample2 in $file !">>$rainbowpath
+                                #((success++))
+                                #sleep 10
+
+                         #else
+                                   #echo "No Md5-16 Found looser .."
+                        #fi
+
+		pos=6
+
+		while [ $pos -le $size2 ]
+		do
+
+		        #echo ${md52:0:$pos}
+
+		        sample2=${md52:0:$pos}
+
+		        cat "$file" | grep -q "$sample2"
+
+		        if [ $? -eq 0 ] 
+		        then
+
+
+                                echo "=============================================">>$rainbowpath
+		                echo "Fucking Found (echo-n) $sample2 in $file !"
+				echo "Fucking Found (echo-n) $sample2 in $file !">>$rainbowpath
+		                echo "Date = $DATE Tweet Nbr : $4 Current Second : $loopcounter">>$rainbowpath
+        		        echo "Text = $SAMPLE">>$rainbowpath
+        	        	echo "Md5sum = $MD5">>$rainbowpath
+        		        echo "Md5sum (echo-n) = $MD52">>$rainbowpath
+        		        echo "=============================================">>$rainbowpath
+
+
+				((success++))
+				sleep 10
+				
+		         else
+#		        	   echo "No Md5 (echo-n) Found looser .."
+				   break
+		        fi
+		        let pos=pos+1
+		done
+
+
+
+
+
+#	     	echo -n "$up"
+
+#             	echo "Date = $DATE Tweet Nbr : $4 Seconds left : $loopcounter">>$rainbowpath
+#             	echo "Text = $SAMPLE">>$rainbowpath
+#	     	echo "Md5sum = $MD5">>$rainbowpath
+#		echo "Md5sum (echo-n) = $MD52">>$rainbowpath
+#	     	echo "=============================================">>$rainbowpath
+
+	     	((counter++))
+	done < bible.txt
+
+done
+
+echo
+echo
+echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;echo;
+echo "Found $success md5 hash in $file wich are exactly the same as in $rainbowpath"
+
+if [ $success -eq 0 ]
+then
+	echo;echo;echo;
+	echo "fuck my life"
+fi
+
+echo 
